@@ -1,0 +1,17 @@
+numpy>=1.16.0
+scipy
+scikit-learn
+pandas
+matplotlib
+astropy
+pymc3
+theano>=1.0.4
+mkl-service
+corner
+astroML
+jupyter
+pytest
+pytest-cov
+pyyaml
+git-lfs
+coveralls
