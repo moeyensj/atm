@@ -23,7 +23,7 @@ def getSDSSMOC():
     -------
     None
     """
-    moc_file = "../../data/ADR4.dat"
+    moc_file = os.path.join(os.path.dirname(__file__), "data/ADR4.dat")
     if os.path.isfile(moc_file) is not True:
         print("Could not find SDSS MOC. Attempting download...")
         url = 'http://faculty.washington.edu/ivezic/sdssmoc/ADR4.dat.gz'  
@@ -42,7 +42,7 @@ def getSDSSMOC():
     print("")
     return
 
-def readSDSSMOC(mocFile="../../data/ADR4.dat", download=True):
+def readSDSSMOC(mocFile=os.path.join(os.path.dirname(__file__), "data/ADR4.dat"), download=True):
     """
     Read the SDSS MOC from a file. 
 
@@ -50,7 +50,7 @@ def readSDSSMOC(mocFile="../../data/ADR4.dat", download=True):
     ----------
     mocFile : str, optional
         Path to SDSS MOC.
-        [Default = "../../data/ADR4.dat"] 
+        [Default = "data/ADR4.dat"] 
     download : bool, optional
         If the SDSS MOC file is not found, download it. 
         [Default = True]
