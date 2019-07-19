@@ -52,6 +52,7 @@ def crossmatchNEOWISE(neowise, observations):
 def mergeResultsWithNEOWISE(observations_database, results_database, 
                             minObs=3, 
                             fitCodes=["DVBI"],
+                            neowiseTable="neowise_v1",
                             columnMapping=Config.columnMapping):
     """
     Merges the post-processing observed_stats and model_stats DataFrames
@@ -74,6 +75,10 @@ def mergeResultsWithNEOWISE(observations_database, results_database,
     fitCodes : list, optional
         Fit codes to extract from the NEOWISE table. 
         [Defaults = ["DVBI"]]
+    neowiseTable : str, optional
+        Name of the NEOWISE results table in the observations database 
+        to use. 
+        [Default = "neowise_v1"]
     columnMapping : dict, optional
         This dictionary should define the column names of the user's data relative to the
         internally used names.
@@ -97,27 +102,28 @@ def mergeResultsWithNEOWISE(observations_database, results_database,
     # Connect to observations database and grab NEOWISE results
     # Filter them as desired by the user.
     con = sql.connect(observations_database)
-    neowisev1 = pd.read_sql("""SELECT * FROM neowise_v1""", con)
-    print("There are {} fits for {} unique objects in the 2016 NEOWISE PDS table.".format(len(neowisev1), neowisev1["MPC_PACKED_NAME"].nunique()))
+    neowise = pd.read_sql("""SELECT * FROM {}""".format(neowiseTable), con)
+    print("There are {} fits for {} unique objects in the 2016 NEOWISE PDS table.".format(len(neowise), neowise["MPC_PACKED_NAME"].nunique()))
     print("Selecting only fits with at least {} observations in each band.".format(minObs))
     print("Selecting only fits with fit code(s): {}.".format(", ".join(fitCodes)))
-    neowisev1 = neowisev1[(neowisev1["FIT_CODE"].isin(fitCodes))
-                  & (neowisev1["N_W1"] > minObs)
-                  & (neowisev1["N_W2"] > minObs)
-                  & (neowisev1["N_W3"] > minObs)
-                  & (neowisev1["N_W4"] > minObs)]  
-    print("There are {} fits for {} unique objects.".format(len(neowisev1), 
-                                                                             neowisev1["MPC_PACKED_NAME"].nunique()))
-    neowisev1 = neowisev1[~neowisev1["matched_designation"].isna()]
-    print("{} fits have been matched with an object in observations.".format(len(neowisev1)))
+    neowise = neowise[(neowise["FIT_CODE"].isin(fitCodes))
+                  & (neowise["N_W1"] >= minObs)
+                  & (neowise["N_W2"] >= minObs)
+                  & (neowise["N_W3"] >= minObs)
+                  & (neowise["N_W4"] >= minObs)]  
+    print("There are {} fits for {} unique objects.".format(len(neowise), 
+                                                            neowise["MPC_PACKED_NAME"].nunique()))
+    neowise = neowise[~neowise["matched_designation"].isna()]
+    print("{} fits have been matched with an object in observations.".format(len(neowise)))
     print("Sorting by number of observations and keeping the fits using the most observations...")
-    neowisev1 = neowisev1.sort_values(by=["N_W1", "N_W2", "N_W3", "N_W4"], ascending=False)
-    neowisev1 = neowisev1.drop_duplicates(subset=["matched_designation"], keep="first")
-    print("{} fits have been found for {} unique objects in observations.".format(len(neowisev1), neowisev1["matched_designation"].nunique()))
-    print("")
+    neowise = neowise.sort_values(by=["N_W1", "N_W2", "N_W3", "N_W4"], ascending=False)
+    neowise = neowise.drop_duplicates(subset=["matched_designation"], keep="first")
+    
     print("Merging NEOWISE results with post-processed tables...")
     merged_results = model_stats.merge(observed_stats, on=columnMapping["designation"])
-    merged_results = merged_results.merge(neowisev1, left_on=columnMapping["designation"], right_on="matched_designation")
+    merged_results = merged_results.merge(neowise, left_on=columnMapping["designation"], right_on="matched_designation")
+    print("")
+    print("{} fits have been found for {} unique objects in observations.".format(len(merged_results),              merged_results["matched_designation"].nunique()))
     print("Done.")
     print("")
     return merged_results, (observations_pp, model_observations_pp, observed_stats, model_stats)
