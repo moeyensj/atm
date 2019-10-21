@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
    name="atm",
-   version="0.9.0",
+   version="0.9.5",
    license="BSD 3-Clause License",
    author="Joachim Moeyens",
    author_email="moeyensj@uw.edu",
