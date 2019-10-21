@@ -414,7 +414,7 @@ def test_fit_constant_emissivity():
         albedoSpecification=albedoSpecification,
         columnMapping=columnMapping,
         samples=5000,
-        threads=4)
+        threads=1)
 
     np.testing.assert_allclose(10**summary_neatm[summary_neatm["parameter"] == "logD"]["median"].values, [10**3.00], rtol=0.02)
     np.testing.assert_allclose(summary_neatm[summary_neatm["parameter"] == "eps"]["median"].values, [0.78], rtol=0.01)
@@ -528,7 +528,7 @@ def test_fit_combination_emissivity():
         albedoSpecification=albedoSpecification,
         columnMapping=columnMapping,
         samples=5000,
-        threads=4)
+        threads=1)
 
     np.testing.assert_allclose(10**summary_neatm[summary_neatm["parameter"] == "logD"]["median"].values, [10**3.00], rtol=0.02)
     np.testing.assert_allclose(summary_neatm[summary_neatm["parameter"] == "eps_W1W2"]["median"].values, [0.70], rtol=0.01)
@@ -645,7 +645,7 @@ def test_fit_combination_albedo():
         albedoSpecification=albedoSpecification,
         columnMapping=columnMapping,
         samples=5000,
-        threads=4)
+        threads=1)
 
     np.testing.assert_allclose(10**summary_neatm[summary_neatm["parameter"] == "logD"]["median"].values, [10**3.00], rtol=0.02)
     np.testing.assert_allclose(summary_neatm[summary_neatm["parameter"] == "p_W1W2"]["median"].values, [0.26], rtol=0.01)
