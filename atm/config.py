@@ -82,7 +82,7 @@ class Config(object):
             "upper": 1},
         "p": {
             "lower": 0,
-            "upper": 1
+            "upper": 5
             },
         "eta": {
             "lower": 0,
