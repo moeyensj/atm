@@ -6,9 +6,17 @@ Asteroid Thermal Modeling
 [![Docker Pulls](https://img.shields.io/docker/pulls/moeyensj/atm)](https://hub.docker.com/r/moeyensj/atm)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-## Installation
+## Overview
 
-The corresponding notebook repository can be found at: https://github.com/moeyensj/atm_notebooks
+This is the main code repository that contains the ATM code. While this code can be used in a standalone fashion, please consider also downloading the atm_notebooks and atm_data repositories. 
+
+The reference paper "ATM: An open-source tool for asteroid thermal modeling and its application to NEOWISE data" can be found at: https://doi.org/10.1016/j.icarus.2019.113575. 
+
+The corresponding notebook repository with tutorial notebooks and notebooks that reproduce all the results in the reference paper can be found at: https://github.com/moeyensj/atm_notebooks. 
+
+The data repository used for the reference paper can be found at: https://github.com/moeyensj/atm_data
+
+## Installation
 
 We recommend installing the code along one of two installation paths: either a source code installation, or an installation via docker.
 
@@ -31,7 +39,7 @@ Or, to install pre-requisite software using `pip`:
 
 ```pip install -r requirements.txt```
 
-At this stage, you can use the code to create model spectral energy distributions for the different thermal models. However, if you want to fit observations of asteroids you will need to download the lookup tables for the relevant models. 
+At this stage, you can use the code to create model spectral energy distributions for the different thermal models. However, if you want to fit observations of asteroids you will need to download the lookup tables for the relevant models. Activate the environment in which the ATM pre-requisite software is installed and then proceed to download the model tables:
 
 To download the NEATM lookup tables:
 
