@@ -1,0 +1,7 @@
+include atm/*.py
+include *.md
+include *.toml
+exclude .travis.yml
+exclude requirements_travis.txt
+exclude azure-pipelines.yml 
+exclude Dockerfile

@@ -1,3 +1,4 @@
+from .version import *
 from .config import *
 from .constants import *
 from .frames import *

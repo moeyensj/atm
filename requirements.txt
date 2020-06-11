@@ -9,9 +9,9 @@ theano>=1.0.4
 mkl-service
 corner
 astroML
-jupyter
 pytest
 pytest-cov
 pyyaml
 git-lfs
 coveralls
+setuptools_scm
