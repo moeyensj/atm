@@ -1,4 +1,4 @@
-from .version import *
+from .version import __version__
 from .config import *
 from .constants import *
 from .frames import *
