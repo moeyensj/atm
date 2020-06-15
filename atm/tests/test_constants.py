@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import numpy as np
-from astropy import constants as c
+from astropy.constants import astropyconst20 as c
 
 from ..constants import Constants
 
