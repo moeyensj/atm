@@ -16,6 +16,7 @@ install:
   - conda info -a
   - conda create -q -n atm python=$TRAVIS_PYTHON_VERSION -c defaults -c conda-forge --file requirements_travis.txt --yes
   - source activate atm
+  - python setup.py install
 
 script: 
   - py.test atm --cov=atm
