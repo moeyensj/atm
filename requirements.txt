@@ -9,6 +9,7 @@ theano>=1.0.4
 mkl-service
 corner
 astroML
+ipykernel
 pytest
 pytest-cov
 pyyaml
