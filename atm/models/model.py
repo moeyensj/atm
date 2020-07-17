@@ -213,7 +213,7 @@ class Model(object):
             print("")
 
         for i, lambd in enumerate(lambds):
-            lambd_str = "{:0=11.6f}e-06".format(lambd / 1e-6)
+            lambd_str = "{:0=15.10f}e-06".format(lambd / 1e-6)
             lambd_float = float(lambd_str)
             if verbose is True:
                 print("Building table {} out of {}".format(i + 1, len(lambds)))
