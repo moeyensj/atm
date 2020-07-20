@@ -152,7 +152,7 @@ class Model(object):
                     print("Wavelength: {}".format(elements[2]))
                 self._tableLambdas.append(float(elements[2]))
                 self._tableLambdaFiles[float(elements[2])] = tableFile
-               
+                
                 if verbose is True:
                     print("Subsolar Temperature:")
                     print("\tMin: {}".format(elements[4]))
@@ -235,27 +235,35 @@ class Model(object):
                                                               alphaRange[0],
                                                               alphaRange[1],
                                                               alphaStep)
-
-            if verbose is True:
-                print("Building table file: {}".format(outFileName))
-                print("Wavelength: {}".format(lambd_str))
-                print("Subsolar Temperature:")
-                print("\tMin: {:.4f}".format(tRange[0]))
-                print("\tMax: {:.4f}".format(tRange[1]))
-                print("\tStep: {:.4f}".format(tStep))
-                print("\tPoints: {}".format(len(temps)))
-                print("Alpha:")
-                print("\tMin: {:.4f}".format(alphaRange[0]))
-                print("\tMax: {:.4f}".format(alphaRange[1]))
-                print("\tStep: {:.4f}".format(alphaStep))
-                print("\tPoints: {}".format(len(alpha)))
-                print("Total number of integrations: {}".format(len(t)))
-                print("Starting integrations (this may take a while)...")
-
-            flux = self.calcTotalFluxLambdaEmittedToObsMany(l, t, a, threads=threads)
-            flux = flux.reshape([len(temps), len(alpha)])
             outFile = os.path.join(self._tableDir, outFileName)
-            np.savez(outFile, T_ss=temps, alpha=alpha, fluxLambda=flux)
+            
+            # If file does not exist build it 
+            if not os.path.exists(outFile + ".npz"):
+                if verbose is True:
+                    print("Building table file: {}".format(outFileName))
+                    print("Wavelength: {}".format(lambd_str))
+                    print("Subsolar Temperature:")
+                    print("\tMin: {:.4f}".format(tRange[0]))
+                    print("\tMax: {:.4f}".format(tRange[1]))
+                    print("\tStep: {:.4f}".format(tStep))
+                    print("\tPoints: {}".format(len(temps)))
+                    print("Alpha:")
+                    print("\tMin: {:.4f}".format(alphaRange[0]))
+                    print("\tMax: {:.4f}".format(alphaRange[1]))
+                    print("\tStep: {:.4f}".format(alphaStep))
+                    print("\tPoints: {}".format(len(alpha)))
+                    print("Total number of integrations: {}".format(len(t)))
+                    print("Starting integrations (this may take a while)...")
+
+                flux = self.calcTotalFluxLambdaEmittedToObsMany(l, t, a, threads=threads)
+                flux = flux.reshape([len(temps), len(alpha)])
+
+                np.savez(outFile, T_ss=temps, alpha=alpha, fluxLambda=flux)
+            
+            # If the file does exist, move to the next wavelength and do nothing
+            else:
+                if verbose is True:
+                    print("Table file {} exists. Moving on...".format(outFileName))
 
             if verbose is True:
                 print("Done.")
@@ -293,7 +301,6 @@ class Model(object):
             alpha = table["alpha"]
             flux = table["fluxLambda"]
             self.loadedLambdaTables[lambd] = interpolate.RectBivariateSpline(T_ss, alpha, flux)
-            #self.tableLambdaFiles[lambd]
             if verbose is True:
                 print("Loaded table file: {}".format(os.path.basename(tableFileName)))
                 print("Wavelength: {}".format(lambd))
