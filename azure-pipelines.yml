@@ -20,6 +20,8 @@ jobs:
     maxParallel: 4
 
   steps:
+  - checkout: self 
+    lfs: true
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
@@ -51,7 +53,7 @@ jobs:
       source activate atm
       git lfs install
       git lfs fetch
-      pytest atm --cov=atm --ignore=atm/tests/test_fit.py --ignore=atm/functions/tests/test_interpolate_fluxes.py --doctest-modules --junitxml=junit/test-results.xml 
+      pytest atm --cov=atm --ignore=atm/tests/test_fit.py --doctest-modules --junitxml=junit/test-results.xml 
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
