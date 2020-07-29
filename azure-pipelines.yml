@@ -53,7 +53,7 @@ jobs:
       source activate atm
       git lfs install
       git lfs fetch
-      pytest atm --cov=atm --ignore=atm/tests/test_fit.py --doctest-modules --junitxml=junit/test-results.xml 
+      pytest atm --cov=atm --doctest-modules --junitxml=junit/test-results.xml 
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
