@@ -426,12 +426,12 @@ def fit(model, obs, data,
         trace = pm.sample(samples, cores=threads, chains=chains, step=step, progressbar=progressBar)
 
     if plotTrace is True:
-        fig, ax = plt.subplots(len(fitParameters), 2, figsize=(10, 2*len(fitParameters)), **figKwargs)
-        trace_ax = pm.traceplot(trace, 
-                                varnames=fitParameters, 
-                                skip_first=burnInSamples,
-                                ax=ax)
+        trace_ax = pm.traceplot(trace[burnInSamples:], 
+                                var_names=fitParameters,
+                                backend="matplotlib",
+                                backend_kwargs=figKwargs)
         if saveDir != None:
+            fig = trace_ax.ravel()[0].figure
             fig.savefig(os.path.join(saveDir, "{}_{}_{}_{}_trace.png".format(designation, 
                                                                              fitCode, 
                                                                              model.acronym, 
@@ -486,13 +486,18 @@ def fit(model, obs, data,
                                dpi=figKwargs["dpi"],
                                bbox_inches='tight')
 
-    summary = pm.summary(trace, varnames=fitParameters, start=burnInSamples, stat_funcs=[_median, _sigmaG], extend=True)
+    summary = pm.summary(trace[burnInSamples:], varnames=fitParameters, stat_funcs={"median" : _median, "sigmaG" : _sigmaG}, extend=True)
     summary["code"] = np.array([fitCode for i in range(0, len(summary))])
     summary["model"] = np.array([model.acronym for i in range(0, len(summary))])
     summary[columnMapping["designation"]] = np.array([data[columnMapping["designation"]].unique()[0] for i in range(0, len(summary))])
     summary.reset_index(inplace=True)
     summary.rename(columns={"index": "parameter"}, inplace=True)
-    summary = summary[[columnMapping["designation"], "model", "code", "parameter", "median", "sigmaG", "mean", "sd", "mc_error", "n_eff", "Rhat", "hpd_2.5", "hpd_97.5"]]
+    summary = summary[[
+        columnMapping["designation"], "model", "code", 
+        "parameter", "median", "sigmaG", "mean", "sd", 
+        "hpd_3%", "hpd_97%", "mcse_mean", "mcse_sd", "ess_mean",
+        "ess_sd", "ess_bulk", "ess_tail", "r_hat"
+    ]]
     pymc_objs = (pymc_model, trace)
     
     longestFitParameter = 0
