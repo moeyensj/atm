@@ -6,7 +6,7 @@ matplotlib
 astropy
 pymc3==3.6
 theano>=1.0.4
-mkl-service
+mkl
 corner
 astroML
 ipykernel
