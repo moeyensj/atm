@@ -423,21 +423,39 @@ def fit(model, obs, data,
         flux_obs = pm.Normal("flux", mu=y[:, filterToggle], sd=Y_err[:, filterToggle], observed=Y[:, filterToggle])
 
         step = pm.Metropolis(scaling=scaling)
-        trace = pm.sample(samples, cores=threads, chains=chains, step=step, progressbar=progressBar)
-
-    if plotTrace is True:
-        trace_ax = pm.traceplot(trace[burnInSamples:], 
-                                var_names=fitParameters,
-                                backend="matplotlib",
-                                backend_kwargs=figKwargs)
-        if saveDir != None:
-            fig = trace_ax.ravel()[0].figure
-            fig.savefig(os.path.join(saveDir, "{}_{}_{}_{}_trace.png".format(designation, 
-                                                                             fitCode, 
-                                                                             model.acronym, 
-                                                                             obs.acronym)),
-                       bbox_inches='tight')
+        trace = pm.sample(
+            samples, 
+            cores=threads, 
+            chains=chains, 
+            step=step, 
+            progressbar=progressBar, 
+            compute_convergence_checks=False
+        )
     
+    figs = []
+    if plotTrace is True:
+        trace_ax = pm.traceplot(
+            trace[burnInSamples:], 
+            var_names=fitParameters,
+            backend="matplotlib"
+        )
+        fig = trace_ax.ravel()[0].figure
+        figs.append(fig)
+        
+        if saveDir != None:
+            fig.savefig(
+                os.path.join(
+                    saveDir, 
+                    "{}_{}_{}_{}_trace.png".format(
+                        designation, 
+                        fitCode, 
+                        model.acronym, 
+                        obs.acronym
+                    )
+                ),
+                bbox_inches='tight'
+            )
+        
     if plotCorner is True:        
         stack = []
         truths = []
@@ -478,6 +496,7 @@ def fit(model, obs, data,
                                    truths=truths, 
                                    quantiles=(0.16, 0.84),
                                    show_titles=True)
+        figs.append(corner_fig)
         if saveDir != None:
             corner_fig.savefig(os.path.join(saveDir, "{}_{}_{}_{}_corner.png".format(designation, 
                                                                                      fitCode, 
@@ -486,7 +505,7 @@ def fit(model, obs, data,
                                dpi=figKwargs["dpi"],
                                bbox_inches='tight')
 
-    summary = pm.summary(trace[burnInSamples:], varnames=fitParameters, stat_funcs={"median" : _median, "sigmaG" : _sigmaG}, extend=True)
+    summary = pm.summary(trace[burnInSamples:], var_names=fitParameters, stat_funcs={"median" : _median, "sigmaG" : _sigmaG}, extend=True)
     summary["code"] = np.array([fitCode for i in range(0, len(summary))])
     summary["model"] = np.array([model.acronym for i in range(0, len(summary))])
     summary[columnMapping["designation"]] = np.array([data[columnMapping["designation"]].unique()[0] for i in range(0, len(summary))])
@@ -528,7 +547,7 @@ def fit(model, obs, data,
     print("")
     
     if returnFigs is True:
-        return summary, model_observations, pymc_objs, [fig, corner_fig]
+        return summary, model_observations, pymc_objs, figs
     else:
         return summary, model_observations, pymc_objs
 
