@@ -4,7 +4,7 @@ scikit-learn
 pandas
 matplotlib
 astropy
-pymc3>=3.8
+pymc3=3.8
 theano>=1.0.4
 mkl
 corner
@@ -16,3 +16,4 @@ pyyaml
 git-lfs
 coveralls
 setuptools_scm
+arviz<0.11.0

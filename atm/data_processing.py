@@ -111,7 +111,7 @@ def clipObservations(observations, obs, magCut=1.0, minObs=3, maxObsCut=0.3, col
     print("The observations DataFrame has been updated: see observations['keep'] for clipping flag.")
     return observations_flagged
 
-def modifyErrors(observations, obs, sigma=0.15, columnMapping=Config.columnMapping):
+def modifyErrors(observations, obs, sigma=0.15, columnMapping=Config.columnMapping, verbose=False):
     """
     Adds a constant magnitude offset to the errors in an observations DataFrame.
     
@@ -139,15 +139,19 @@ def modifyErrors(observations, obs, sigma=0.15, columnMapping=Config.columnMappi
     observations = observations.copy()
         
     for magErr in columnMapping["magErr"]:
-        print("Added {} magnitude errors to {}.".format(sigma, magErr))
+        if verbose:
+            print("Added {} magnitude errors to {}.".format(sigma, magErr))
         observations[magErr] = observations[magErr] + sigma
 
     fluxErr = obs.convertMagErrToFluxLambdaErr(observations[columnMapping["mag"]].values, observations[columnMapping["magErr"]].values)
-    print("Converted magnitude errors to flux errors.")
+    if verbose:
+        print("Converted magnitude errors to flux errors.")
     for i, flambdaErr in enumerate(columnMapping["fluxErr_si"]):
-        print("Updating {} with new error.".format(flambdaErr))
+        if verbose:
+            print("Updating {} with new error.".format(flambdaErr))
         observations[flambdaErr] = fluxErr[:, i]
 
-    print("Done.")
-    print("")
+    if verbose:
+        print("Done.")
+        print("")
     return observations
