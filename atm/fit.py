@@ -423,21 +423,39 @@ def fit(model, obs, data,
         flux_obs = pm.Normal("flux", mu=y[:, filterToggle], sd=Y_err[:, filterToggle], observed=Y[:, filterToggle])
 
         step = pm.Metropolis(scaling=scaling)
-        trace = pm.sample(samples, cores=threads, chains=chains, step=step, progressbar=progressBar)
-
-    if plotTrace is True:
-        fig, ax = plt.subplots(len(fitParameters), 2, figsize=(10, 2*len(fitParameters)), **figKwargs)
-        trace_ax = pm.traceplot(trace, 
-                                varnames=fitParameters, 
-                                skip_first=burnInSamples,
-                                ax=ax)
-        if saveDir != None:
-            fig.savefig(os.path.join(saveDir, "{}_{}_{}_{}_trace.png".format(designation, 
-                                                                             fitCode, 
-                                                                             model.acronym, 
-                                                                             obs.acronym)),
-                       bbox_inches='tight')
+        trace = pm.sample(
+            samples, 
+            cores=threads, 
+            chains=chains, 
+            step=step, 
+            progressbar=progressBar, 
+            compute_convergence_checks=False
+        )
     
+    figs = []
+    if plotTrace is True:
+        trace_ax = pm.traceplot(
+            trace[burnInSamples:], 
+            var_names=fitParameters,
+            backend="matplotlib"
+        )
+        fig = trace_ax.ravel()[0].figure
+        figs.append(fig)
+        
+        if saveDir != None:
+            fig.savefig(
+                os.path.join(
+                    saveDir, 
+                    "{}_{}_{}_{}_trace.png".format(
+                        designation, 
+                        fitCode, 
+                        model.acronym, 
+                        obs.acronym
+                    )
+                ),
+                bbox_inches='tight'
+            )
+        
     if plotCorner is True:        
         stack = []
         truths = []
@@ -478,6 +496,7 @@ def fit(model, obs, data,
                                    truths=truths, 
                                    quantiles=(0.16, 0.84),
                                    show_titles=True)
+        figs.append(corner_fig)
         if saveDir != None:
             corner_fig.savefig(os.path.join(saveDir, "{}_{}_{}_{}_corner.png".format(designation, 
                                                                                      fitCode, 
@@ -486,13 +505,18 @@ def fit(model, obs, data,
                                dpi=figKwargs["dpi"],
                                bbox_inches='tight')
 
-    summary = pm.summary(trace, varnames=fitParameters, start=burnInSamples, stat_funcs=[_median, _sigmaG], extend=True)
+    summary = pm.summary(trace[burnInSamples:], var_names=fitParameters, stat_funcs={"median" : _median, "sigmaG" : _sigmaG}, extend=True)
     summary["code"] = np.array([fitCode for i in range(0, len(summary))])
     summary["model"] = np.array([model.acronym for i in range(0, len(summary))])
     summary[columnMapping["designation"]] = np.array([data[columnMapping["designation"]].unique()[0] for i in range(0, len(summary))])
     summary.reset_index(inplace=True)
     summary.rename(columns={"index": "parameter"}, inplace=True)
-    summary = summary[[columnMapping["designation"], "model", "code", "parameter", "median", "sigmaG", "mean", "sd", "mc_error", "n_eff", "Rhat", "hpd_2.5", "hpd_97.5"]]
+    summary = summary[[
+        columnMapping["designation"], "model", "code", 
+        "parameter", "median", "sigmaG", "mean", "sd", 
+        "hpd_3%", "hpd_97%", "mcse_mean", "mcse_sd", "ess_mean",
+        "ess_sd", "ess_bulk", "ess_tail", "r_hat"
+    ]]
     pymc_objs = (pymc_model, trace)
     
     longestFitParameter = 0
@@ -523,7 +547,7 @@ def fit(model, obs, data,
     print("")
     
     if returnFigs is True:
-        return summary, model_observations, pymc_objs, [fig, corner_fig]
+        return summary, model_observations, pymc_objs, figs
     else:
         return summary, model_observations, pymc_objs
 

@@ -367,5 +367,5 @@ def interpFittedFluxLambdaAndMagObs(model, obs, data, summary,
     columns += ["model_flux_si_{}".format(f) for f in obs.filterNames] 
     columns += ["model_mag_{}".format(f) for f in obs.filterNames]
     model_observations = pd.DataFrame(np.concatenate([data[columnMapping["obs_id"]].values.reshape(-1, 1), fitted_flux, fitted_magnitudes], axis=1), columns=columns)
-    model_observations[columnMapping["obs_id"]] = model_observations[columnMapping["obs_id"]].astype(int, inplace=True)
+    model_observations[columnMapping["obs_id"]] = model_observations[columnMapping["obs_id"]].astype(int)
     return model_observations

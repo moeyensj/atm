@@ -255,7 +255,7 @@ class Observatory(object):
         elif self._fluxLambdaNorm is not None:
             return -2.5 * np.log10(fluxLambda / self.fluxLambdaNorm)
         else:
-            raise valueError("Neither fluxLambdaNorm nor fluxNuNorm are defined.")
+            raise ValueError("Neither fluxLambdaNorm nor fluxNuNorm are defined.")
             
     def convertMagToFluxLambda(self, mag):
         """
@@ -283,7 +283,7 @@ class Observatory(object):
         elif self._fluxLambdaNorm is not None:
             return 10**(- mag / 2.5) * self._fluxLambdaNorm
         else:
-            raise valueError("Neither fluxLambdaNorm nor fluxNuNorm are defined.")
+            raise ValueError("Neither fluxLambdaNorm nor fluxNuNorm are defined.")
             
     def convertFluxLambdaErrToMagErr(self, fluxLambda, fluxLambdaErr):
         """
